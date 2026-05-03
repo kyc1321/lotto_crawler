@@ -22,7 +22,7 @@ jobs:
         run: pip install argparse pathlib requests typing
 
       - name: 크롤링 실행
-        run: python crawler.py
+        run: python /home/runner/work/lotto_crawler/lotto_crawler/crawler.py
 
       - name: 변경된 데이터를 저장소에 업데이트
         run: |
