@@ -1,0 +1,33 @@
+name: Lotto Data Update
+
+on:
+  schedule:
+    # 매주 토요일 한국 시간 밤 9시경 실행 (UTC 기준 12:00)
+    - cron: '0 12 * * 6'
+  workflow_dispatch: # 수동으로도 실행 가능하게 설정
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 코드 가져오기
+        uses: actions/checkout@v3
+
+      - name: 파이썬 설정
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: 필수 라이브러리 설치
+        run: pip install argparse csv json pathlib requests time typing
+
+      - name: 크롤링 실행
+        run: python crawler.py
+
+      - name: 변경된 데이터를 저장소에 업데이트
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@://github.com"
+          git add lotto_results.csv
+          git commit -m "Update lotto data" || echo "No changes to commit"
+          git push
