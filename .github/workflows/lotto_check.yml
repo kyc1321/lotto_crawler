@@ -1,10 +1,13 @@
 name: Lotto Data Update
 
-on:
+on: 
   schedule:
     # 매주 토요일 한국 시간 밤 9시30분경 실행 (UTC 기준 12:30)
     - cron: '30 12 * * 6'
   workflow_dispatch: # 수동으로도 실행 가능하게 설정
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -12,6 +15,8 @@ jobs:
     steps:
       - name: 저장소 코드 가져오기
         uses: actions/checkout@v3
+        with:
+          token: ${{secrets.PAT_TOKEN}}
 
       - name: 파이썬 설정
         uses: actions/setup-python@v4
