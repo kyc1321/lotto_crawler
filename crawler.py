@@ -10,6 +10,7 @@ from pathlib import Path
 import requests
 import time
 from typing import Dict, List, Optional
+from datetime import datetime, timedelta
 
 
 class LottoCrawler:
@@ -97,12 +98,13 @@ class LottoCrawler:
 
         try:
             with path.open('r', encoding='utf-8') as f:
-                reader = csv.DictReader(f, fieldnames=['round', 'no1', 'no2', 'no3', 'no4', 'no5', 'no6', 'bonus'])
+                reader = csv.DictReader(f, fieldnames=['round', 'draw_date', 'no1', 'no2', 'no3', 'no4', 'no5', 'no6', 'bonus'])
                 results = []
                 for row in reader:
                     try:
                         results.append({
                             'round': int(row['round']),
+                            'date': row['draw_date'],
                             'winning_numbers': [
                                 int(row['no1']),
                                 int(row['no2']),
@@ -127,7 +129,7 @@ class LottoCrawler:
         path.parent.mkdir(parents=True, exist_ok=True)
         
         with path.open('w', encoding='utf-8', newline='') as f:
-            fieldnames = ['round', 'no1', 'no2', 'no3', 'no4', 'no5', 'no6', 'bonus']
+            fieldnames = ['round', 'date', 'no1', 'no2', 'no3', 'no4', 'no5', 'no6', 'bonus']
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             
@@ -136,6 +138,7 @@ class LottoCrawler:
                     nums = result['winning_numbers']
                     writer.writerow({
                         'round': result['round'],
+                        'date': result['draw_date'],
                         'no1': nums[0] if len(nums) > 0 else '',
                         'no2': nums[1] if len(nums) > 1 else '',
                         'no3': nums[2] if len(nums) > 2 else '',
@@ -157,24 +160,47 @@ class LottoCrawler:
         existing = self.load_results(output_file)
         if existing:
             latest_round = max((item.get('round') for item in existing if isinstance(item.get('round'), int)), default=0)
+            latest_date = max((item.get('date') for item in existing if item.get('round') == latest_round), default='')
             start = latest_round + 1
         else:
             if start_draw is None:
                 raise ValueError('결과 파일이 없을 경우 --start를 지정해야 합니다.')
             start = start_draw
+            latest_date = ''
+
+        # print(f'latest_round:{latest_round}, latest_date:{latest_date}')
 
         if start_draw is not None:
             start = max(start, start_draw)
+            if latest_date != '':
+                next_date = datetime.strptime(latest_date, '%Y.%m.%d') + timedelta(days=7)
+            else:
+                next_date = datetime.strptime('1900.01.01', '%Y.%m.%d')
 
         crawled = []
         current = start
-        while True:
+        maxRetry = 20
+        today = datetime.now()
+        has_next = next_date <= today
+
+        # 마지막 조회결과의 추첨일이 오늘인 경우 정지(추첨데이터 없음)
+        while has_next and maxRetry > 0:
+            print(f'retrying drawNum: {current}, remain: {maxRetry}, next_date:{next_date.strftime('%Y.%m.%d')}')
+            maxRetry = maxRetry - 1
             result = self.fetch_lottery_results(current)
             if result is None:
+                if maxRetry > 0:
+                    time.sleep(5 * 60)
+                    continue
                 break
-            crawled.append(result)
-            current += 1
 
+            crawled.append(result)
+            next_date = datetime.strptime(result['draw_date'], '%Y.%m.%d') + timedelta(days=7)
+            has_next = next_date <= today
+            if has_next:
+                current += 1
+                maxRetry = 20
+            
         if crawled:
             merged = self.merge_results(existing, crawled)
             self.save_results(output_file, merged)
