@@ -168,7 +168,7 @@ class LottoCrawler:
             start = start_draw
             latest_date = ''
 
-        # print(f'latest_round:{latest_round}, latest_date:{latest_date}')
+        # print(f"latest_round:{latest_round}, latest_date:{latest_date}")
 
         if start_draw is not None:
             start = max(start, start_draw)
@@ -185,7 +185,7 @@ class LottoCrawler:
 
         # 마지막 조회결과의 추첨일이 오늘인 경우 정지(추첨데이터 없음)
         while has_next and maxRetry > 0:
-            print(f'retrying drawNum: {current}, remain: {maxRetry}, next_date:{next_date.strftime('%Y.%m.%d')}')
+            print(f"retrying drawNum: {current}, remain: {maxRetry}, next_date:{next_date.strftime('%Y.%m.%d')}")
             maxRetry = maxRetry - 1
             result = self.fetch_lottery_results(current)
             if result is None:
