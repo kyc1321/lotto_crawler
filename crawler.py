@@ -104,7 +104,7 @@ class LottoCrawler:
                     try:
                         results.append({
                             'round': int(row['round']),
-                            'date': row['draw_date'],
+                            'draw_date': row['draw_date'],
                             'winning_numbers': [
                                 int(row['no1']),
                                 int(row['no2']),
@@ -160,7 +160,7 @@ class LottoCrawler:
         existing = self.load_results(output_file)
         if existing:
             latest_round = max((item.get('round') for item in existing if isinstance(item.get('round'), int)), default=0)
-            latest_date = max((item.get('date') for item in existing if item.get('round') == latest_round), default='')
+            latest_date = max((item.get('draw_date') for item in existing if item.get('round') == latest_round), default='')
             start = latest_round + 1
         else:
             if start_draw is None:
