@@ -179,7 +179,7 @@ class LottoCrawler:
 
         crawled = []
         current = start
-        maxRetry = 20
+        maxRetry = 40
         today = datetime.now()
         has_next = next_date <= today
 
@@ -199,7 +199,7 @@ class LottoCrawler:
             has_next = next_date <= today
             if has_next:
                 current += 1
-                maxRetry = 20
+                maxRetry = 40
             
         if crawled:
             merged = self.merge_results(existing, crawled)
