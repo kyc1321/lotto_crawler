@@ -2,7 +2,7 @@ name: Lotto Data Update
 
 on: 
   repository_dispatch: 
-    types: [trigger-crawling]
+    types: [trigger_crawling]
   # schedule:
     # 매주 토요일 한국 시간 밤 8시35분경 실행 (UTC 기준 11:30)
     # - cron: '35 11 * * 6'
