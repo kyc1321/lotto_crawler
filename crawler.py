@@ -190,7 +190,9 @@ class LottoCrawler:
             result = self.fetch_lottery_results(current)
             if result is None:
                 if maxRetry > 0:
-                    time.sleep(5 * 60)
+                    for t in range(1, 6):
+                        print(f'waiting.. {t}') # 5분 대기(로그출력없으면 멈춘것으로 판단할수도있어서)
+                        time.sleep(60)
                     continue
                 break
 
