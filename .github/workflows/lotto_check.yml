@@ -5,7 +5,7 @@ on:
     # 매주 토요일 한국 시간 밤 7시20분경 실행 
     # - cron: '20 10 * * 6'
     # 테스트로 매일 실행
-    - cron: '45 10 * * *'
+    - cron: '20 10 * * *'
   workflow_dispatch: # 수동으로도 실행 가능하게 설정
 
 permissions:
