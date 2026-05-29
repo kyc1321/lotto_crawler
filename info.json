@@ -1,4 +1,5 @@
 {
     "latestVersion" : "1.3",
-    "useAd": 0
+    "useAd": 0,
+    "maxPickCount": 10
 }
