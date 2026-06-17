@@ -1,5 +1,5 @@
 {
-    "latestVersion" : "1.0",
+    "latestVersion" : "2.0",
     "useAd": 0,
-    "maxPickCount": 5
+    "maxPickCount": 500
 }
